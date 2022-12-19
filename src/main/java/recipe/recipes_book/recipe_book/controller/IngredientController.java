@@ -1,8 +1,8 @@
-package recipes.recipe_book.recipe_book.controller;
+package recipe.recipes_book.recipe_book.controller;
 
 import org.springframework.web.bind.annotation.*;
-import recipes.recipe_book.recipe_book.model.Ingredient;
-import recipes.recipe_book.recipe_book.service.impl.IngredientServiceImpl;
+import recipe.recipes_book.recipe_book.model.Ingredient;
+import recipe.recipes_book.recipe_book.service.impl.IngredientServiceImpl;
 
 import java.util.Collections;
 import java.util.Set;
@@ -17,13 +17,13 @@ public class IngredientController {
         this.ingredientService = ingredientService;
     }
 
-    @PostMapping("/createIngredient")
-    public Ingredient createIngredient(String id, @RequestBody Ingredient ingredient) {
-        return this.ingredientService.addIngredient(id,ingredient);
+    @PostMapping
+    public Ingredient createIngredient(@RequestBody Ingredient ingredient) {
+        return this.ingredientService.addIngredient(ingredient);
     }
 
     @GetMapping("/{id}")
-    public Set<String> getAllIngredients(@PathVariable("id") String id ) {
+    public Set<String> getIngredientById(@PathVariable("id") Long id ) {
         return Collections.singleton(this.ingredientService.getIngredient(id).toString());
     }
 }

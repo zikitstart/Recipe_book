@@ -1,4 +1,4 @@
-package recipes.recipe_book.recipe_book.model;
+package recipe.recipes_book.recipe_book.model;
 
 import java.util.List;
 import java.util.Objects;

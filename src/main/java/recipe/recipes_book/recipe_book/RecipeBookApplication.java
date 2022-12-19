@@ -1,4 +1,4 @@
-package recipes.recipe_book.recipe_book;
+package recipe.recipes_book.recipe_book;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
