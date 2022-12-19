@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/recipe")
+@RequestMapping("/recipes")
 public class RecipeController {
 
     private final RecipeServiceImpl recipeService;
@@ -17,13 +17,13 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @PostMapping("/createRecipe/{id}")
-    public Recipe createRecipe(@PathVariable("id")String id,@RequestBody Recipe recipe) {
+    @PostMapping("/createRecipe")
+    public Recipe createRecipe(String id,@RequestBody Recipe recipe) {
         return this.recipeService.addRecipe(id,recipe);
     }
 
-    @GetMapping("/getRecipes/{id}")
-    public Set<String> getAllRecipes(@PathVariable("id") String id ) {
+    @GetMapping("/{id}")
+    public Set<String> getRecipeById(@PathVariable("id") String id ) {
         return Collections.singleton(this.recipeService.getRecipe(id).toString());
     }
 }
