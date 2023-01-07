@@ -4,15 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import recipe.recipes_book.recipe_book.service.FilesService;
+import recipe.recipes_book.recipe_book.service.RecipeService;
 
 import java.io.*;
 
@@ -21,14 +19,32 @@ import java.io.*;
 @Tag(name = "Файлы.",description = "Методы для работы с файлами.")
 public class FileController {
     private final FilesService filesService;
+    private final RecipeService recipeService;
 
-    public FileController(FilesService filesService) {
+    public FileController(FilesService filesService, RecipeService recipeService) {
         this.filesService = filesService;
+        this.recipeService = recipeService;
+    }
+    @GetMapping("/downloadRecipesTxt")
+    @Operation(
+            summary = "Скачать все рецепты в txt.",
+            description = "Метод для скачивания всех рецептов в виде txt-файла."
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Файл загружен."
+                    )
+            }
+    )
+    public ResponseEntity<Object> downloadRecipeFileTxt(){
+        return recipeService.downloadRecipeTxt();
     }
 
-    @GetMapping("/exportRecipes")
+    @GetMapping("/downloadRecipesJson")
     @Operation(
-            summary = "Скачать все рецепты.",
+            summary = "Скачать все рецепты в json.",
             description = "Метод для скачивания всех рецептов в виде json-файла."
     )
     @ApiResponses(
@@ -40,17 +56,7 @@ public class FileController {
             }
     )
     public ResponseEntity<InputStreamResource> downloadRecipeFile() throws FileNotFoundException {
-        File file = filesService.getRecipeFile();
-        if (file.exists()) {
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .contentLength(file.length())
-                    .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"RecipeFile.json\"")
-                    .body(resource);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        return filesService.downloadRecipe();
     }
     @PostMapping(value = "/importRecipes",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
@@ -66,14 +72,7 @@ public class FileController {
             }
     )
     public ResponseEntity<Void> uploadRecipeFile(@RequestParam MultipartFile file) {
-        File recipeFile = filesService.getRecipeFile();
-        try (FileOutputStream fos = new FileOutputStream(recipeFile)){
-            IOUtils.copy(file.getInputStream(), fos);
-            return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        return filesService.uploadRecipe(file);
     }
     @PostMapping(value = "/importIngredients",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
@@ -89,13 +88,6 @@ public class FileController {
             }
     )
     public ResponseEntity<Void> uploadIngredientFile(@RequestParam MultipartFile file) {
-        File ingredientFile = filesService.getIngredientFile();
-        try (FileOutputStream fos = new FileOutputStream(ingredientFile)){
-            IOUtils.copy(file.getInputStream(), fos);
-            return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        return filesService.uploadIngredient(file);
     }
 }
